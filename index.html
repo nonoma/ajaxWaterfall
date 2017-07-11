@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>瀑布流</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    
+    #ul1 {
+        width: 1040px;
+        margin: 0 auto;
+    }
+    
+    #ul1 li {
+        width: 250px;
+        margin: 0 10px 10px 0;
+        float: left;
+        list-style: none;
+    }
+    
+    #ul1 li div {
+        border: 1px solid #000;
+        margin-bottom: 10px;
+    }
+    
+    #ul1 li img {
+        display: block;
+        width: 248px;
+    }
+    </style>
+</head>
+
+<body>
+    <ul id="ul1">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+    <script src="js/ajax.js"></script>
+    <script>
+    function preloadimages(arr, success) {
+        var newimages = [],
+            loadedimages = 0
+        var arr = (typeof arr != "object") ? [arr] : arr;
+
+        function imageloadpost() {
+            loadedimages++
+            if (loadedimages == arr.length) {
+                success();
+            }
+        }
+        for (var i = 0; i < arr.length; i++) {
+            newimages[i] = new Image()
+            newimages[i].src = arr[i]
+            newimages[i].onload = function() {
+                imageloadpost()
+            }
+            newimages[i].onerror = function() {
+                imageloadpost()
+            }
+        }
+    }
+
+    function addContent(data) {
+        var d = JSON.parse(data);
+        var oLi = document.getElementsByTagName('li');
+        var arrImg = [];
+        for (var j = 0; j < d.length; j++) {
+            arrImg.push(d[j].image);
+        }
+        for (var i = 0; i < d.length; i++) {
+            var oDiv = document.createElement('div');
+            var oImg = document.createElement('img');
+            oImg.src = d[i].image;
+
+            var oP = document.createElement('p');
+            oP.innerHTML = d[i].title;
+            oDiv.appendChild(oImg);
+
+            oImg.style.height = d[i].height * (249 / d[i].width) + 'px';
+            oDiv.appendChild(oP);
+            var iH = oLi[0].offsetHeight;
+            var index = 0;
+            for (var j = 1; j < oLi.length; j++) {
+                if (iH > oLi[j].offsetHeight) {
+                    index = j;
+                    iH = oLi[j].offsetHeight;
+                }
+            }
+            oLi[index].appendChild(oDiv);
+        }
+            preloadimages(arrImg, function() {
+                cpageIndex++;
+                ajax({
+                    method: 'get',
+                    url: 'getPics.php',
+                    data: 'cpage=' + cpageIndex,
+                    success: function(data) {
+                        addContent(data);
+                    }
+                });
+            });
+    }
+    var cpageIndex = 1;
+    ajax({
+        method: 'get',
+        url: 'getPics.php',
+        data: 'cpage=' + cpageIndex,
+        success: function(data) {
+            addContent(data);
+
+        }
+    });
+    </script>
+</body>
+
+</html>
