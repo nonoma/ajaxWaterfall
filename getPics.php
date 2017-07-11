@@ -15,6 +15,6 @@ $url = 'http://www.wookmark.com/api/json/popular?page=' . $cpage;
 $content = file_get_contents($url);
 $content = iconv('gbk', 'utf-8', $content);
 
-echo json_encode($content,true);
+echo $content;
 
 ?>
