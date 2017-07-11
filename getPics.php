@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 header('Content-type:text/html; charset="utf-8"');
 
 $cpage = isset($_GET['cpage']) ? $_GET['cpage'] : 1;
